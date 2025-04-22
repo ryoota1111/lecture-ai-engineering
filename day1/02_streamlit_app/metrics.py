@@ -40,9 +40,10 @@ def calculate_metrics(answer, correct_answer):
     bleu_score = 0.0
     similarity_score = 0.0
     relevance_score = 0.0
+    format_score = 0.0
 
     if not answer: # 回答がない場合は計算しない
-        return bleu_score, similarity_score, word_count, relevance_score
+        return bleu_score, similarity_score, word_count, relevance_score, format_score
 
     # 単語数のカウント
     tokenizer = Tokenizer()
@@ -92,8 +93,27 @@ def calculate_metrics(answer, correct_answer):
         except Exception as e:
             # st.warning(f"関連性スコア計算エラー: {e}")
             relevance_score = 0.0 # エラー時は0
+        
+        # 形式スコアの計算
+        try:
+            score = 0
+            total = 3
 
-    return bleu_score, similarity_score, word_count, relevance_score
+            # 先頭が大文字で始まっているか
+            if answer and answer[0].isupper():
+                score += 1
+            # 最後がピリオド、疑問符、感嘆符で終わっているか
+            if answer and answer.strip()[-1] in {".", "。", "!", "！", "?", "？"}:
+                score += 1
+            # 文中に複数の文があるか
+            if len(re.findall(r'[。.!?！？]', answer)) >= 2:
+                score += 1
+
+            format_score = score / total
+        except Exception as e:
+            format_score = 0.0  # エラー時は0
+
+    return bleu_score, similarity_score, word_count, relevance_score, format_score
 
 def get_metrics_descriptions():
     """評価指標の説明を返す"""
@@ -104,5 +124,6 @@ def get_metrics_descriptions():
         "類似度スコア (similarity_score)": "TF-IDFベクトルのコサイン類似度による、正解と回答の意味的な類似性 (0〜1の値)",
         "単語数 (word_count)": "回答に含まれる単語の数。情報量や詳細さの指標",
         "関連性スコア (relevance_score)": "正解と回答の共通単語の割合。トピックの関連性を表す (0〜1の値)",
-        "効率性スコア (efficiency_score)": "正確性を応答時間で割った値。高速で正確な回答ほど高スコア"
+        "効率性スコア (efficiency_score)": "正確性を応答時間で割った値。高速で正確な回答ほど高スコア",
+        "形式スコア（format_score）": "形式的な一致を基準にスコア（0〜1の値）"
     }
