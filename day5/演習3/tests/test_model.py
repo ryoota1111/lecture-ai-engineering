@@ -30,7 +30,16 @@ def sample_data():
 
         # 必要なカラムのみ選択
         df = df[
-            ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked", "Survived"]
+            [
+                "Pclass",
+                "Sex",
+                "Age",
+                "SibSp",
+                "Parch",
+                "Fare",
+                "Embarked",
+                "Survived",
+            ]
         ]
 
         os.makedirs(os.path.dirname(DATA_PATH), exist_ok=True)
@@ -48,10 +57,7 @@ def preprocessor():
 
     # 数値特徴量の前処理（欠損値補完と標準化）
     numeric_transformer = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="median")),
-            ("scaler", StandardScaler()),
-        ]
+        steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())]
     )
 
     # カテゴリカル特徴量の前処理（欠損値補完とOne-hotエンコーディング）
