@@ -57,7 +57,10 @@ def preprocessor():
 
     # 数値特徴量の前処理（欠損値補完と標準化）
     numeric_transformer = Pipeline(
-        steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())]
+        steps=[
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler()),
+        ]
     )
 
     # カテゴリカル特徴量の前処理（欠損値補完とOne-hotエンコーディング）
