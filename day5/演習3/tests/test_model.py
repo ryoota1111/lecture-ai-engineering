@@ -87,7 +87,7 @@ def train_model(sample_data, preprocessor):
     model = Pipeline(
         steps=[
             ("preprocessor", preprocessor),
-            ("classifier", RandomForestClassifier(n_estimators=100, random_state=42)),
+            ("classifier", RandomForestClassifier(n_estimators=200, random_state=42)),
         ]
     )
 
@@ -171,3 +171,30 @@ def test_model_reproducibility(sample_data, preprocessor):
     assert np.array_equal(
         predictions1, predictions2
     ), "モデルの予測結果に再現性がありません"
+
+
+def test_model_regression_check(train_model):
+    """保存済みの過去モデルと比較して新モデルの精度が劣化していないか確認"""
+    current_model, X_test, y_test = train_model
+
+    # 現在のモデルの精度を計算
+    y_pred_current = current_model.predict(X_test)
+    current_accuracy = accuracy_score(y_test, y_pred_current)
+
+    # 過去モデルが存在しなければスキップ
+    legacy_model_path = os.path.join(MODEL_DIR, "titanic_model_prev.pkl")
+    if not os.path.exists(legacy_model_path):
+        pytest.skip("過去モデルが存在しないためスキップします")
+
+    # 過去モデルをロードして精度を計算
+    with open(legacy_model_path, "rb") as f:
+        previous_model = pickle.load(f)
+
+    y_pred_prev = previous_model.predict(X_test)
+    previous_accuracy = accuracy_score(y_test, y_pred_prev)
+
+    # 過去モデルと比較して新モデルが劣化していないかを確認（許容範囲 -> 0.02）
+    assert current_accuracy >= previous_accuracy - 0.02, (
+        f"新モデルの精度が過去モデルより劣化しています: "
+        f"current={current_accuracy:.3f}, previous={previous_accuracy:.3f}"
+    )
