@@ -30,7 +30,16 @@ def sample_data():
 
         # 必要なカラムのみ選択
         df = df[
-            ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked", "Survived"]
+            [
+                "Pclass",
+                "Sex",
+                "Age",
+                "SibSp",
+                "Parch",
+                "Fare",
+                "Embarked",
+                "Survived",
+            ]
         ]
 
         os.makedirs(os.path.dirname(DATA_PATH), exist_ok=True)
@@ -171,6 +180,7 @@ def test_model_reproducibility(sample_data, preprocessor):
     assert np.array_equal(
         predictions1, predictions2
     ), "モデルの予測結果に再現性がありません"
+
 
 def test_model_regression_check(train_model):
     """保存済みの過去モデルと比較して新モデルの精度が劣化していないか確認"""
