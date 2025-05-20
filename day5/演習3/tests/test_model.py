@@ -172,6 +172,7 @@ def test_model_reproducibility(sample_data, preprocessor):
         predictions1, predictions2
     ), "モデルの予測結果に再現性がありません"
 
+
 def test_model_regression_check(train_model):
     """保存済みの過去モデルと比較して新モデルの精度が劣化していないか確認"""
     current_model, X_test, y_test = train_model
